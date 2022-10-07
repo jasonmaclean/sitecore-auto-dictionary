@@ -1,0 +1,79 @@
+----item----
+version: 1
+id: {9F358296-CDD3-496E-8B1F-ADFC9FCAD97A}
+database: master
+path: /sitecore/system/Modules/SitecoreFundamentals/AutoDictionary/Auto Dictionary Settings
+parent: {54A01B32-EE80-42C1-84C7-0390DBFB64CF}
+name: Auto Dictionary Settings
+master: {00000000-0000-0000-0000-000000000000}
+template: {7A006290-8CAD-4F84-BD2F-564F1D862FA9}
+templatekey: Auto Dictionary Settings
+
+----version----
+language: en
+version: 1
+revision: 5a5d22e3-c681-4cfd-ab7b-f35fdb745875
+
+----field----
+field: {0AFA674D-2B90-4234-91E0-08EFA80FAA09}
+name: EmailFrom
+key: emailfrom
+content-length: 0
+
+
+----field----
+field: {C6F2B6FB-5A3F-4680-A2BD-BCE37FA5CF80}
+name: EmailTo
+key: emailto
+content-length: 0
+
+
+----field----
+field: {E68C59FA-270A-4D83-BFDA-FADCFEB9C425}
+name: EmailBcc
+key: emailbcc
+content-length: 0
+
+
+----field----
+field: {6438399B-8BC1-4402-8747-1D3C9973BEF3}
+name: BeginningOfEmail
+key: beginningofemail
+content-length: 131
+
+<p>The following items have been created and published in your Sitecore Dictionary, and should be reviewed by the content team.</p>
+----field----
+field: {9BFC5700-B1CE-4D34-8084-4960B476C9B1}
+name: EndOfEmail
+key: endofemail
+content-length: 0
+
+
+----field----
+field: {25BED78C-4957-4165-998A-CA1B52F67497}
+name: __Created
+key: __created
+content-length: 16
+
+20220919T234219Z
+----field----
+field: {8CDC337E-A112-42FB-BBB4-4143751E123F}
+name: __Revision
+key: __revision
+content-length: 36
+
+5a5d22e3-c681-4cfd-ab7b-f35fdb745875
+----field----
+field: {D9CF14B1-FA16-4BA6-9288-E8A174D4D522}
+name: __Updated
+key: __updated
+content-length: 16
+
+20221007T160130Z
+----field----
+field: {BADD9CF9-53E0-4D0C-BCC0-2D784C282F6A}
+name: __Updated by
+key: __updated by
+content-length: 14
+
+sitecore\admin
