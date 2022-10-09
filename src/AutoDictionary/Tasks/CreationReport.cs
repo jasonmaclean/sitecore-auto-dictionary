@@ -13,13 +13,12 @@ namespace SitecoreFundamentals.AutoDictionary.Tasks
 {
     public class CreationReport
     {
-        internal static List<DictionaryReportItem> DictionaryReportItems = new List<DictionaryReportItem>();
-
         public void Run()
         {
-            var dictionaryReportItems = DictionaryReportItems.ToList();
+            var dictionaryReportItems = new Lists.DictionaryReportItems();
+            var allDictionaryReportItems = dictionaryReportItems.GetAll();
 
-            if (!dictionaryReportItems.Any())
+            if (!allDictionaryReportItems.Any())
                 return;
 
             Database masterDb = Sitecore.Configuration.Factory.GetDatabase("master");
@@ -34,7 +33,7 @@ namespace SitecoreFundamentals.AutoDictionary.Tasks
 
             var sb = new StringBuilder();
 
-            foreach (var reportItem in dictionaryReportItems)
+            foreach (var reportItem in allDictionaryReportItems)
             {
                 sb.Append($"<strong>{Settings.GetSetting("SitecoreFundamentals.AutoDictionary.CreationReportEmail.NewItem")}:</strong> {reportItem.Path}<br />");
                 sb.Append($"<strong>{Settings.GetSetting("SitecoreFundamentals.AutoDictionary.CreationReportEmail.Key")}:</strong> {reportItem.Key}<br />");
@@ -42,10 +41,10 @@ namespace SitecoreFundamentals.AutoDictionary.Tasks
                 sb.Append($"<strong>{Settings.GetSetting("SitecoreFundamentals.AutoDictionary.CreationReportEmail.Language")}:</strong> {reportItem.LanguageName}<br />");
                 sb.Append($"<strong>{Settings.GetSetting("SitecoreFundamentals.AutoDictionary.CreationReportEmail.PageUrl")}:</strong> <a href=\"{reportItem.ContextUrl}\">{reportItem.ContextUrl}</a><br />");
 
-                if (reportItem != dictionaryReportItems.Last())
+                if (reportItem != allDictionaryReportItems.Last())
                     sb.Append("<br />");
 
-                DictionaryReportItems.Remove(reportItem);
+                dictionaryReportItems.Remove(reportItem);
             }
 
             if (settingsItem.Fields[Constants.Templates.Settings.Fields.SendEmailNotifications].Value != "1")

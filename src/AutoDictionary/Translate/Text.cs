@@ -1,9 +1,7 @@
 ﻿using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
-using Sitecore.Eventing;
 using SitecoreFundamentals.AutoDictionary.EventHandlers;
 using SitecoreFundamentals.AutoDictionary.Models;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
@@ -11,8 +9,6 @@ namespace SitecoreFundamentals.AutoDictionary
 {
     public static class Translate
     {
-        internal static List<DictionaryReportItem> DictionaryItemsNotFound = new List<DictionaryReportItem>();
-
         public static string Text(string key)
             => Text(key, "", "");
 
@@ -43,16 +39,24 @@ namespace SitecoreFundamentals.AutoDictionary
             var item = Sitecore.Context.Database.GetItem($"{createPath}{itemName}");
             if (item == null || item.Versions.Count == 0)
             {
-                var itemPath = createPath + itemName;
+                var dictionaryReportItems = new Lists.DictionaryReportItems();
 
-                if (!DictionaryItemsNotFound.Any(x => x.Path.ToLowerInvariant() == itemPath.ToLowerInvariant() && x.LanguageName == Sitecore.Context.Language.Name))
+                var itemPath = createPath + itemName;
+                var saveToMaster = false;
+
+                if (!dictionaryReportItems.GetAll().Any(x => x.Path.ToLowerInvariant() == itemPath.ToLowerInvariant() && x.LanguageName == Sitecore.Context.Language.Name))
                 {
-                    DictionaryItemsNotFound.Add(new DictionaryReportItem()
+                    dictionaryReportItems.Add(new DictionaryReportItem()
                     {
                         Path = itemPath,
                         LanguageName = Sitecore.Context.Language.Name
                     });
 
+                    saveToMaster = true;
+                }
+
+                if (saveToMaster)
+                {
                     Log.Info($"{typeof(Translate).FullName}.{nameof(Text)} => Cannot find item \"{itemName}\" in path \"{createPath}\". Returning default value of {defaultValue} and raising creation event.", $"{typeof(Translate).FullName}.{nameof(Text)}");
 
                     AddItemSaveEvent evt = new AddItemSaveEvent();
@@ -64,7 +68,7 @@ namespace SitecoreFundamentals.AutoDictionary
                     evt.ContextUrl = HttpContext.Current?.Request.Url.AbsoluteUri;
                     evt.Language = Sitecore.Context.Language;
 
-                    EventManager.RaiseEvent(evt);
+                    Sitecore.Configuration.Factory.GetDatabase("web").RemoteEvents.EventQueue.QueueEvent<AddItemSaveEvent>(evt, true, true);
                 }
 
                 if (string.IsNullOrWhiteSpace(defaultValue))

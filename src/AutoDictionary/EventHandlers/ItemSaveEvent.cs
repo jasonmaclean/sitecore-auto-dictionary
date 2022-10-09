@@ -1,6 +1,9 @@
 ﻿
+using Sitecore.Configuration.KnownSettings;
 using Sitecore.Data;
 using Sitecore.Data.Items;
+using Sitecore.Data.Managers;
+using Sitecore.Data.Query;
 using Sitecore.Diagnostics;
 using Sitecore.Eventing;
 using Sitecore.Events;
@@ -8,6 +11,7 @@ using Sitecore.Events.Hooks;
 using Sitecore.Globalization;
 using Sitecore.Publishing;
 using Sitecore.SecurityModel;
+using Sitecore.Web.UI.WebControls.Presentation;
 using SitecoreFundamentals.AutoDictionary.Models;
 using System;
 using System.Collections.Generic;
@@ -21,19 +25,19 @@ namespace SitecoreFundamentals.AutoDictionary.EventHandlers
         public virtual void OnAddItemSaveRemote(object sender, EventArgs e)
         {
             Log.Info($"{typeof(AddItemSaveEventHandler).FullName}.{nameof(OnAddItemSaveRemote)} => Event Queue has picked up a new Item Save Event. Creating or updating item in the Master database content tree now.", this);
-
+            
             if (e is AddItemSaveEventArgs)
             {
                 var args = e as AddItemSaveEventArgs;
 
+                if (args == null)
+                {
+                    Log.Error($"{typeof(AddItemSaveEventHandler).FullName}.{nameof(OnAddItemSaveRemote)} => args == null.", this);
+                    return;
+                }
+
                 using (new SecurityDisabler())
                 {
-                    if (args == null)
-                    {
-                        Log.Error($"{typeof(AddItemSaveEventHandler).FullName}.{nameof(OnAddItemSaveRemote)} => args == null.", this);
-                        return;
-                    }
-
                     Database masterDb = Sitecore.Configuration.Factory.GetDatabase("master");
                     Database webDb = Sitecore.Configuration.Factory.GetDatabase("web");
 
@@ -98,6 +102,8 @@ namespace SitecoreFundamentals.AutoDictionary.EventHandlers
 
                                 try
                                 {
+                                    var dictionaryReportItems = new Lists.DictionaryReportItems();
+
                                     var saveItem = masterDb.GetItem(itemPath);
 
                                     if (saveItem == null)
@@ -123,8 +129,8 @@ namespace SitecoreFundamentals.AutoDictionary.EventHandlers
                                         itemToPublish = saveItem;
 
                                     if (saveItem.TemplateID == Constants.Templates.Dictionary.DictionaryEntry 
-                                        && !Tasks.CreationReport.DictionaryReportItems.Any(x => x.Path.ToLowerInvariant() == itemPath.ToLowerInvariant() 
-                                            && x.LanguageName == args.Language.Name))
+                                        && !dictionaryReportItems.GetAll().Any(x => x.Path.ToLowerInvariant() == itemPath.ToLowerInvariant() 
+                                        && x.LanguageName == args.Language.Name))
                                     {
                                         var reportItem = new DictionaryReportItem()
                                         {
@@ -135,7 +141,7 @@ namespace SitecoreFundamentals.AutoDictionary.EventHandlers
                                             LanguageName = args.Language.Name
                                         };
 
-                                        Tasks.CreationReport.DictionaryReportItems.Add(reportItem);
+                                        dictionaryReportItems.Add(reportItem);
                                     }
 
                                     Log.Info($"{typeof(AddItemSaveEventHandler).FullName}.{nameof(OnAddItemSaveRemote)} => Item \"{itemName}\" with ID {saveItem.ID.ToShortID()} has {logAction} the Master database.", this);
@@ -148,10 +154,10 @@ namespace SitecoreFundamentals.AutoDictionary.EventHandlers
 
                             if (itemToPublish != null)
                             {
-                                PublishOptions publishingOptions = new PublishOptions(itemToPublish.Database, webDb, PublishMode.SingleItem, itemToPublish.Language, DateTime.Now);
-                                publishingOptions.RootItem = itemToPublish;
-                                publishingOptions.Deep = true;
-                                new Publisher(publishingOptions).Publish();
+                                Database[] databases = new Database[1] { webDb };
+                                Language[] language = new Language[1] { itemToPublish.Language };
+
+                                Sitecore.Handle publishHandle = PublishManager.PublishItem(itemToPublish, databases, language, true, false);
 
                                 Log.Info($"{typeof(AddItemSaveEventHandler).FullName}.{nameof(OnAddItemSaveRemote)} => Item \"{itemToPublish.Name}\" with ID {itemToPublish.ID.ToShortID()} and its children are being published.", this);
                             }
