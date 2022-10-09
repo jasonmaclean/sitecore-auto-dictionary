@@ -83,10 +83,12 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="EventHandlers\ItemSaveEvent.cs" />
+    <Compile Include="Lists\DictionaryItemsNotFound.cs" />
     <Compile Include="Models\AutoDictionary.cs" />
     <Compile Include="Pipelines\GetTranslation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tasks\CreationReport.cs" />
+    <Compile Include="Lists\DictionaryReportItems.cs" />
     <Compile Include="Translate\Text.cs" />
   </ItemGroup>
   <ItemGroup>
