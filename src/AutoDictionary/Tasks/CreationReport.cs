@@ -60,7 +60,7 @@ namespace SitecoreFundamentals.AutoDictionary.Tasks
             var beginningOfEmail = settingsItem.Fields[Constants.Templates.Settings.Fields.BeginningOfEmail].Value;
             var endOfEmail = settingsItem.Fields[Constants.Templates.Settings.Fields.EndOfEmail].Value;
 
-            if (string.IsNullOrWhiteSpace(emailFrom) || string.IsNullOrWhiteSpace(emailFrom))
+            if (string.IsNullOrWhiteSpace(emailFrom) || string.IsNullOrWhiteSpace(emailTo))
             {
                 Log.Warn($"{typeof(CreationReport).FullName}.{nameof(Run)} => Dictionary creation emails are enabled but the From or To address is empty.", this);
                 return;
